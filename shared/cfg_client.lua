@@ -1,7 +1,7 @@
-Config = {}
+Config = Config or {}
 
 -- General configuration
-Config.UseItem = true
+Config.UseItem = false
 Config.CommandName = "fingerscan"
 Config.Item = "fingerscanner"
 
