@@ -2,7 +2,7 @@ fx_version 'adamant'
 
 game 'gta5'
 
-description 'A FiveM fingerprint system'
+description 'Fingerprint system'
 author 'robinapi'
 version '1.0'
 

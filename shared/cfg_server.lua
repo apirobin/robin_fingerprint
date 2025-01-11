@@ -1,18 +1,18 @@
 Config = Config or {}
 
--- Job-Konfiguration
+-- Job-Configuration
 Config.AllowedJobs = {
     ["police"] = true,
     ["ambulance"] = true
 }
 Config.RequireJob = true
 
--- Discord-Log-Konfiguration
+-- Discord Logs
 Config.DiscordLogs = {
-    PublicLogWebhook = "https://discord.com/api/webhooks/1327587612105637888/nPxAzYm9xdxsr8gNHIsZxWBfkKSNP6uVaKcv2Unsf8rx41-ylmC-QtlZq5SYuUl4dA8L", -- Webhook für öffentliche Logs
-    AdminLogWebhook = "https://discord.com/api/webhooks/1327587612105637888/nPxAzYm9xdxsr8gNHIsZxWBfkKSNP6uVaKcv2Unsf8rx41-ylmC-QtlZq5SYuUl4dA8L", -- Webhook für Admin-Logs
-    SuccessColor = 3447003, -- Blau für Erfolg
-    ErrorColor = 15158332, -- Rot für Fehler
+    PublicLogWebhook = "https://discord.com/api/webhooks/1327587612105637888/nPxAzYm9xdxsr8gNHIsZxWBfkKSNP6uVaKcv2Unsf8rx41-ylmC-QtlZq5SYuUl4dA8L", -- Public-Log webhook
+    AdminLogWebhook = "https://discord.com/api/webhooks/1327587612105637888/nPxAzYm9xdxsr8gNHIsZxWBfkKSNP6uVaKcv2Unsf8rx41-ylmC-QtlZq5SYuUl4dA8L", -- Admin-Log webhook
+    SuccessColor = 3447003, -- Color for Success
+    ErrorColor = 15158332, -- Color for Failure
     Texts = {
         LogSuccessTitle = "✅ Fingerscan Erfolgreich",
         LogNoPlayerTitle = "❌ Fingerscan Fehlgeschlagen",

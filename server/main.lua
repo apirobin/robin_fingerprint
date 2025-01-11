@@ -1,9 +1,7 @@
 ESX = exports["es_extended"]:getSharedObject()
-
--- Config laden
 Config = Config or {}
 
--- Laden der shared Config-Dateien
+-- Loading Configs
 local clientConfig = LoadResourceFile(GetCurrentResourceName(), "shared/cfg_client.lua")
 local serverConfig = LoadResourceFile(GetCurrentResourceName(), "shared/cfg_server.lua")
 
@@ -17,21 +15,21 @@ if serverConfig then
     serverChunk()
 end
 
--- Spieler benachrichtigen
+-- Notify player
 function NotifyPlayer(target, message)
     TriggerClientEvent('esx:showNotification', target, message)
 end
 
--- Spieler in der Nähe finden
+-- Find nearby players
 function GetClosestPlayer(source, maxDistance)
     local players = GetPlayers()
     local sourceCoords = GetEntityCoords(GetPlayerPed(source))
     local closestPlayer, closestDistance = nil, maxDistance
 
     for _, playerId in ipairs(players) do
-        if tonumber(playerId) ~= tonumber(source) then -- Spieler darf nicht sich selbst sein
+        if tonumber(playerId) ~= tonumber(source) then
             local playerPed = GetPlayerPed(playerId)
-            if DoesEntityExist(playerPed) then -- Sicherstellen, dass der Ped existiert
+            if DoesEntityExist(playerPed) then 
                 local playerCoords = GetEntityCoords(playerPed)
                 local distance = #(sourceCoords - playerCoords)
                 if distance < closestDistance then
@@ -44,15 +42,15 @@ function GetClosestPlayer(source, maxDistance)
     return closestPlayer, closestDistance
 end
 
--- Logs an Discord senden
+-- Send log to Discord
 function SendDiscordLog(webhook, title, description, color)
     if webhook and webhook ~= "" then
         PerformHttpRequest(webhook, function() end, 'POST', json.encode({
             username = "Fingerscanner",
             embeds = {{
-                title = title, -- Titel des Logs
-                description = description, -- Beschreibung des Logs
-                color = color or 3447003, -- Farbe des Logs (Standard: Blau)
+                title = title, -- Titel for Log
+                description = description, -- Description for Log
+                color = color, -- Color of Log
                 author = {
                     name = "Fingerscanner System",
                     icon_url = "https://cdn.discordapp.com/avatars/907594318674526230/e07e7ba39a38e11211f0762634bf9033?size=1024"
@@ -64,48 +62,48 @@ function SendDiscordLog(webhook, title, description, color)
                     text = "Fingerscanner-Protokoll",
                     icon_url = "https://cdn.discordapp.com/avatars/907594318674526230/e07e7ba39a38e11211f0762634bf9033?size=1024"
                 },
-                timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ") -- UTC-Zeit für Konsistenz
+                timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ") -- Timestamp
             }}
         }), { ['Content-Type'] = 'application/json' })
     end
 end
 
--- Hauptfunktion für den Fingerscan
+-- Scan-Function
 function PerformScan(source)
     local xPlayer = ESX.GetPlayerFromId(source)
     local copName = xPlayer.getName()
     local copIdentifier = xPlayer.identifier
 
-    -- Berechtigungsprüfung
+    -- Permission check
     if Config.RequireJob and not Config.AllowedJobs[xPlayer.job.name] then
         NotifyPlayer(source, Config.Texts.NoPermission)
         return
     end
 
-    -- Spieler in der Nähe finden
+    -- Get nearest Player
     local closestPlayer, closestDistance = GetClosestPlayer(source, 3)
-    if not closestPlayer then -- Kein Spieler in der Nähe
+    if not closestPlayer then -- No Player nearby
         NotifyPlayer(source, Config.Texts.NoPlayerNearby)
         SendDiscordLog(Config.DiscordLogs.AdminLogWebhook, Config.DiscordLogs.Texts.LogNoPlayerTitle, 
             (Config.DiscordLogs.Texts.LogNoPlayerFormat):format(copName, copIdentifier), Config.DiscordLogs.ErrorColor)
         return
     end
 
-    -- Zielspieler-Daten abrufen
+    -- get target player
     local targetPlayer = ESX.GetPlayerFromId(closestPlayer)
-    if not targetPlayer then -- Ungültiger Spieler
+    if not targetPlayer then -- No Player found
         NotifyPlayer(source, Config.Texts.ScanFailed)
         return
     end
 
-    -- Daten des Zielspielers
+    -- target player data
     local targetName = targetPlayer.getName()
     local targetIdentifier = targetPlayer.identifier
 
-    -- Erfolgsmeldung an den Spieler
+    -- Successnotify
     NotifyPlayer(source, (Config.Texts.ScanSuccess):format(targetName, closestPlayer))
 
-    -- Logs senden
+    -- Send Discord Logs
     SendDiscordLog(Config.DiscordLogs.PublicLogWebhook, Config.DiscordLogs.Texts.LogSuccessTitle, 
         (Config.DiscordLogs.Texts.LogPublicFormat):format(copName, targetName), Config.DiscordLogs.SuccessColor)
     
@@ -114,7 +112,7 @@ function PerformScan(source)
         Config.DiscordLogs.SuccessColor)
 end
 
--- Command oder Item registrieren
+-- register command or item
 if Config.UseItem then
     ESX.RegisterUsableItem(Config.Item, function(source)
         PerformScan(source)
